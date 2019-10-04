@@ -27,12 +27,18 @@ describe('Test Addition', () => {
     expect(wrapper.state('sum')).toBe(5001);
   });
 
-  test('Sum of two valid numbers with extra elements', () => {
+  test('Sum of many valid numbers', () => {
     wrapper.find('textarea').simulate('change', {
       target: {value: '10,2,10,10,10'},
     });
 
-    expect(wrapper.state('sum')).toBe(12);
+    expect(wrapper.state('sum')).toBe(42);
+
+    wrapper.find("textarea").simulate("change",{
+      target: {value: "1,2,3,4,5,6,7,8,9,10,12"}
+    });
+
+    expect(wrapper.state('sum')).toBe(78);
   });
 
   test('Sum of one valid and one invalid number', () => {
@@ -48,7 +54,7 @@ describe('Test Addition', () => {
       target: {value: 'foobar,20,20,2'},
     });
 
-    expect(wrapper.state('sum')).toBe(20);
+    expect(wrapper.state('sum')).toBe(42);
   });
 
   test('Sum of two invalid numbers', () => {
@@ -88,6 +94,6 @@ describe('Test Addition', () => {
       target: {value: '-1 , -5000,50\n'},
     });
 
-    expect(wrapper.state('sum')).toBe(0);
+    expect(wrapper.state('sum')).toBe(50);
   });
 });

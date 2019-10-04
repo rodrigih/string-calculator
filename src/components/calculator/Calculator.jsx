@@ -19,10 +19,7 @@ class Calculator extends Component {
     const {delim} = this.state;
 
     let newStr = event.target.value;
-    let numArr = newStr
-      .trim()
-      .split(delim)
-      .slice(0, 2); // Limit to 2 numbers
+    let numArr = newStr.trim().split(delim);
     numArr = convertNums(numArr);
 
     let sum = numArr.reduce((acc, curr) => acc + curr, 0);
