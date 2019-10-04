@@ -1,0 +1,31 @@
+.calculator{
+  padding: 1em;
+  justify-content: space-around;
+}
+
+.calculator h2{ 
+  text-decoration: underline;
+}
+
+.calculator textarea{ 
+  max-width: 90%;
+  width: 50%;
+  height: 10vh;
+  border-radius: 5px;
+}
+
+.calculator textarea:hover{ border-color: black; } 
+.calculator textarea:focus{ border-color: #10A4E4; }
+
+.calculator > div{
+  flex-grow: 1;
+}
+
+.calculator > div:first-child{
+  border-right: 3px solid #252525;
+  max-width: 80%;
+}
+
+.calculator .result{
+  font-size: calc(1em + 1vmin);
+} 
