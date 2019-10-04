@@ -7,93 +7,120 @@ Enzyme.configure({adapter: new Adapter()});
 
 const wrapper = shallow(<Calculator />);
 
-describe('Test Addition', () => {
-  test('Sum of empty string', () => {
-    expect(wrapper.state('sum')).toBe(0);
+const enterStr = str => {
+  wrapper.find('textarea').simulate('change', {
+    target: {value: str},
+  });
+};
+
+describe('onChange()', () => {
+  describe('with comma delimiter', () => {
+    describe('and valid numbers', () => {
+      test('adds one number', () => {
+        enterStr('20');
+        expect(wrapper.state('sum')).toBe(20);
+      });
+
+      test('adds two numbers', () => {
+        enterStr('1,5000');
+        expect(wrapper.state('sum')).toBe(5001);
+      });
+
+      test('adds multiple numbers', () => {
+        enterStr('10,2,10,10,10');
+        expect(wrapper.state('sum')).toBe(42);
+
+        enterStr('1,2,3,4,5,6,7,8,9,10,11,12');
+        expect(wrapper.state('sum')).toBe(78);
+      });
+
+      test('adds negative numbers', () => {
+        enterStr('-2,-2,-2');
+        expect(wrapper.state('sum')).toBe(-6);
+      });
+
+      test('adds positive and negative numbers', () => {
+        enterStr('80,-20,-10,5');
+        expect(wrapper.state('sum')).toBe(55);
+      });
+    });
+
+    describe('and valid and invalid numbers', () => {
+      test('adds empty string', () => {
+        enterStr("");
+        expect(wrapper.state('sum')).toBe(0);
+      });
+
+      test('ignores invalid numbers', () => {
+        enterStr('hello,world,foo,bar');
+        expect(wrapper.state('sum')).toBe(0);
+      });
+
+      test('adds valid numbers and ignores invalid numbers', () => {
+        enterStr('hello,5,world,a2,10');
+        expect(wrapper.state('sum')).toBe(15);
+      });
+    });
   });
 
-  test('One valid number', () => {
-    wrapper.find('textarea').simulate('change', {
-      target: {value: '20'},
+  describe('with newline delimiter', () => {
+    describe('and valid numbers', () => {
+      test('adds multiple numbers', () => {
+        let numArr = [10, 2, 10, 10, 10];
+        enterStr(numArr.join('\n'));
+        expect(wrapper.state('sum')).toBe(42);
+
+        numArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        enterStr(numArr.join('\n'));
+        expect(wrapper.state('sum')).toBe(78);
+      });
+
+      test('adds negative numbers', () => {
+        let numArr = [-2, -2, -2];
+        enterStr(numArr.join('\n'));
+        expect(wrapper.state('sum')).toBe(-6);
+      });
+
+      test('adds positive and negative numbers', () => {
+        let numArr = [80, -20, -10, 5];
+        enterStr(numArr.join('\n'));
+        expect(wrapper.state('sum')).toBe(55);
+      });
     });
-    expect(wrapper.state('sum')).toBe(20);
+
+    describe('and valid and invalid numbers', () => {
+      test('ignores invalid numbers', () => {
+        let numArr = ['hello', 'world', 'foo', 'bar'];
+        enterStr(numArr.join('\n'));
+        expect(wrapper.state('sum')).toBe(0);
+      });
+
+      test('adds valid numbers and ignores invalid numbers', () => {
+        let numArr = ['hello', 5, 'world', 'a2', 5];
+        enterStr(numArr.join('\n'));
+        expect(wrapper.state('sum')).toBe(10);
+      });
+    });
   });
 
-  test('Sum of two valid numbers', () => {
-    wrapper.find('textarea').simulate('change', {
-      target: {value: '1,5000'},
+  describe('with mixed delimiters', () => {
+    describe('and valid numbers', () => {
+      test('adds multiple numbers', () => {
+        enterStr('17,6\n6,\n10');
+        expect(wrapper.state('sum')).toBe(39);
+      });
+
+      test('adds positive and negative numbers', () => {
+        enterStr('-10,6\n-6,\n20');
+        expect(wrapper.state('sum')).toBe(10);
+      });
     });
 
-    expect(wrapper.state('sum')).toBe(5001);
-  });
-
-  test('Sum of many valid numbers', () => {
-    wrapper.find('textarea').simulate('change', {
-      target: {value: '10,2,10,10,10'},
+    describe('and valid and invalid numbers', () => {
+      test('adds valid numbers and ignores invalid numbers', () => {
+        enterStr('hello,world\n2,5\n7\nfoobar');
+        expect(wrapper.state('sum')).toBe(14);
+      });
     });
-
-    expect(wrapper.state('sum')).toBe(42);
-
-    wrapper.find("textarea").simulate("change",{
-      target: {value: "1,2,3,4,5,6,7,8,9,10,12"}
-    });
-
-    expect(wrapper.state('sum')).toBe(78);
-  });
-
-  test('Sum of one valid and one invalid number', () => {
-    wrapper.find('textarea').simulate('change', {
-      target: {value: 'foobar,20'},
-    });
-
-    expect(wrapper.state('sum')).toBe(20);
-  });
-
-  test('Sum of one valid and one invalid number with extra elements', () => {
-    wrapper.find('textarea').simulate('change', {
-      target: {value: 'foobar,20,20,2'},
-    });
-
-    expect(wrapper.state('sum')).toBe(42);
-  });
-
-  test('Sum of two invalid numbers', () => {
-    wrapper.find('textarea').simulate('change', {
-      target: {value: 'hello,world'},
-    });
-
-    expect(wrapper.state('sum')).toBe(0);
-  });
-
-  test('Sum of two invalid numbers with extra elements', () => {
-    wrapper.find('textarea').simulate('change', {
-      target: {value: 'hello,world,foo,bar,baz'},
-    });
-
-    expect(wrapper.state('sum')).toBe(0);
-  });
-
-  test('Negative number and positive number', () => {
-    wrapper.find('textarea').simulate('change', {
-      target: {value: '-1,2'},
-    });
-
-    expect(wrapper.state('sum')).toBe(1);
-  });
-
-  test('Negative numbers only', () => {
-    wrapper.find('textarea').simulate('change', {
-      target: {value: '-1,-5000'},
-    });
-
-    expect(wrapper.state('sum')).toBe(-5001);
-  });
-
-  test('Valid numbers with trailing whitespace', () => {
-    wrapper.find('textarea').simulate('change', {
-      target: {value: '-1 , -5000,50\n'},
-    });
-
-    expect(wrapper.state('sum')).toBe(50);
   });
 });

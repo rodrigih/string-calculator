@@ -8,6 +8,7 @@ class Calculator extends Component {
 
     this.state = {
       delim: ',',
+      altDelim: "\n",
       sum: 0,
       calcString: '',
     };
@@ -16,10 +17,12 @@ class Calculator extends Component {
   }
 
   handleChange(event) {
-    const {delim} = this.state;
+    const {delim,altDelim} = this.state;
+
+    const delimPattern = new RegExp(`${delim}|${altDelim}`);
 
     let newStr = event.target.value;
-    let numArr = newStr.trim().split(delim);
+    let numArr = newStr.trim().split(delimPattern);
     numArr = convertNums(numArr);
 
     let sum = numArr.reduce((acc, curr) => acc + curr, 0);
