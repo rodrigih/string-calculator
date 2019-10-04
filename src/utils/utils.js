@@ -4,3 +4,7 @@ export const convertNums = arr => {
     return isNumber ? Number(curr) : 0;
   });
 };
+
+export const getNegNums = arr => {
+  return arr.filter(curr => curr < 0);
+};

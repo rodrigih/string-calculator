@@ -1,31 +1,49 @@
-.calculator{
+.calculator {
   padding: 1em;
   justify-content: space-around;
 }
 
-.calculator h2{ 
+.calculator h2 {
   text-decoration: underline;
 }
 
-.calculator textarea{ 
+.calculator textarea {
   max-width: 90%;
   width: 50%;
   height: 10vh;
   border-radius: 5px;
 }
 
-.calculator textarea:hover{ border-color: black; } 
-.calculator textarea:focus{ border-color: #10A4E4; }
-
-.calculator > div{
-  flex-grow: 1;
+.calculator-textarea:hover {
+  border-color: black;
+}
+.calculator-textarea:focus {
+  border-color: #10a4e4;
 }
 
-.calculator > div:first-child{
+.calculator > div {
+  flex-grow: 1;
+  padding: 1em;
+}
+
+.calculator > div:first-child {
   border-right: 3px solid #252525;
   max-width: 80%;
 }
 
-.calculator .result{
+.calculator .result,
+.calculator .error {
   font-size: calc(1em + 1vmin);
-} 
+}
+
+.calculator .error {
+  color: red;
+  width: 100%;
+}
+
+.calculator-textarea-error,
+.calculator-textarea-error:hover,
+.calculator-textarea-error:focus {
+  border: 2px solid #d03f41;
+  outline-color: #d03f41;
+}

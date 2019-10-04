@@ -1,23 +1,26 @@
-import React, {Component} from 'react';
-import {convertNums} from '../../utils/utils';
-import './Calculator.css';
+import React, { Component } from "react";
+import cx from "classnames";
+import { convertNums, getNegNums } from "../../utils/utils";
+import "./Calculator.css";
 
 class Calculator extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      delim: ',',
+      delim: ",",
       altDelim: "\n",
       sum: 0,
-      calcString: '',
+      calcString: "",
+      hasError: false,
+      negNumArr: []
     };
 
     this.handleChange = this.handleChange.bind(this);
   }
 
   handleChange(event) {
-    const {delim,altDelim} = this.state;
+    const { delim, altDelim } = this.state;
 
     const delimPattern = new RegExp(`${delim}|${altDelim}`);
 
@@ -30,11 +33,22 @@ class Calculator extends Component {
     this.setState({
       sum: sum,
       calcString: newStr,
+      negNumArr: getNegNums(numArr)
     });
   }
 
   render() {
-    const {calcString, sum} = this.state;
+    const { calcString, sum, negNumArr } = this.state;
+
+    let resultDiv = <div className="result"> Sum: {sum} </div>;
+
+    let errorDiv = (
+      <div className="flex-column error">
+        <b>Error:</b>
+        Remove the following negative numbers:
+        <div>{negNumArr.join()}</div>
+      </div>
+    );
 
     return (
       <div className="calculator flex">
@@ -42,6 +56,10 @@ class Calculator extends Component {
           <h2>Enter calculation string</h2>
           <form>
             <textarea
+              className={cx({
+                "calculator-textarea-error": negNumArr.length,
+                "calculator-textarea": !negNumArr.length
+              })}
               value={calcString}
               placeholder="Enter calculation"
               onChange={this.handleChange}
@@ -50,7 +68,8 @@ class Calculator extends Component {
         </div>
         <div>
           <h2>Result</h2>
-          <div className="result"> Sum: {sum} </div>
+          {negNumArr.length ? errorDiv : resultDiv}
+          resultDiv
         </div>
       </div>
     );
