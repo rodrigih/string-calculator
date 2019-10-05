@@ -276,12 +276,44 @@ describe("handleCalcStrChange()", () => {
 
     describe("with special character(s)", () => {
       test("adds valid numbers", () => {
-        enterStr("//[[]]\n1[]87[]66\n-34");
+        enterStr("//[\\[\\]]\n1[]87[]66\n-34");
         expect(wrapper.state("sum")).toBe(120);
       });
 
       test("adds valid numbers and ignores invalid numbers", () => {
         enterStr("//[(|)]\n111\n222(|)ignore(|)LoremIpsumDimSum(|)333");
+        expect(wrapper.state("sum")).toBe(666);
+      });
+    });
+  });
+
+  describe("with multiple custom delimiters", () => {
+    /* Allow Negative numbers for each test and reset upperBound*/
+    beforeAll(() => {
+      markCheckBox(true);
+      enterUpperBound("1000");
+    });
+
+    describe("with no special characters", () => {
+      test("adds valid numbers", () => {
+        enterStr("//[***][,,,]\n11***22,,,33");
+        expect(wrapper.state("sum")).toBe(66);
+      });
+
+      test("adds valid numbers and ignores invalid numbers", () => {
+        enterStr("//[hello][world]\n-37hello100world,000world19");
+        expect(wrapper.state("sum")).toBe(82);
+      });
+    });
+
+    describe("with special character(s)", () => {
+      test("adds valid numbers", () => {
+        enterStr("//[\\[\\]][|]\n1[]87|66\n-34");
+        expect(wrapper.state("sum")).toBe(120);
+      });
+
+      test("adds valid numbers and ignores invalid numbers", () => {
+        enterStr("//[(|)][\\\\]\n111\n222(|)ignore\\LoremIpsumDimSum(|)333");
         expect(wrapper.state("sum")).toBe(666);
       });
     });

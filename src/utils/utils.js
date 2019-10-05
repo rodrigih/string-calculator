@@ -19,7 +19,7 @@ export const getNegNums = arr => {
 
 export const getFormatData = str => {
   let singleCharPattern = /^\/\/(.)\n/;
-  let multiCharPattern = /^\/\/\[(.+)\]\n/;
+  let multiCharPattern = /^\/\/(\[(.+)\])+\n/;
 
   let singleMatch = str.match(singleCharPattern);
   let multiMatch = str.match(multiCharPattern);
@@ -33,7 +33,7 @@ export const getFormatData = str => {
 
   if (multiMatch) {
     return {
-      delim: multiMatch[1],
+      delim: multiMatch[2].split("]["),
       numStr: str.replace(multiCharPattern, "")
     };
   }
@@ -45,6 +45,21 @@ export const getFormatData = str => {
   };
 };
 
+/*
+ * Does not escapre following chars:
+ *  - "\": to allow user to escape characters
+ *  - "[" and "]": have user manually escape these to remove ambiguity
+ *    with multiple multi-character delimiters
+ */
 export const regExpEscape = str => {
-  return str.replace(/[-[\]{}()*+!<=:?.\/\\^$|#\s,]/g, "\\$&");
+  return str.replace(/[-\{}()*+!<=:?.\/^$|#\s,]/g, "\\$&");
+};
+
+export const regExpEscapeAll = str => {
+  return str.replace(/[-[\]\{}()*+!<=:?.\/\\^$|#\s,]/g, "\\$&");
+};
+
+export const createDelimPattern = arr => {
+  var patternStr = arr.map(curr => regExpEscape(curr)).join("|");
+  return new RegExp(patternStr);
 };

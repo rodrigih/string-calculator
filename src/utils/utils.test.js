@@ -49,9 +49,21 @@ describe("getFormatData()", () => {
     expect(numStr).toEqual("1,2,3,4");
   });
 
-  test("parses string and multi-character delimiter", () => {
+  test("parses string and one multi-character delimiter", () => {
     const { delim, numStr } = getFormatData("//[***]\n1,2,3,4");
-    expect(delim).toEqual("***");
+    expect(delim).toEqual(["***"]);
+    expect(numStr).toEqual("1,2,3,4");
+  });
+
+  test("parses string and multiple multi-character delimiter", () => {
+    const { delim, numStr } = getFormatData("//[hello][world]\n1,2,3,4");
+    expect(delim).toEqual(["hello", "world"]);
+    expect(numStr).toEqual("1,2,3,4");
+  });
+
+  test("parses string and multiple multi-character delimiter with special characters", () => {
+    const { delim, numStr } = getFormatData("//[...][\\]\\[]\n1,2,3,4");
+    expect(delim).toEqual(["...", "\\]\\["]);
     expect(numStr).toEqual("1,2,3,4");
   });
 });

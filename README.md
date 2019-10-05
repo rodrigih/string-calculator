@@ -1,4 +1,45 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# String Calculator
+
+## Overview
+
+This is a web app, created with React, that performs calculations on numbers separated by a delimiter.
+The default delimiter is a comma (`,`). The newline character is also treated as a delimiter by default.
+
+## Features
+
+### Upperbounds
+
+An upperbound can be entered so that the calculatoin ignores numbers higher than the upper bound.
+
+### Ignore negative numbers
+
+Negative numbers are ignored by default. The option can be turned on/off via a checkbox.
+
+### Custom delimiters
+
+#### Single character delimiter
+
+The format for enter a single character delimiter is: `//{delimiter}\n{numbers}`
+
+- examples: `//#\n2#5` will return `7`; `//,\n2,ff,100` will return `102`
+
+#### Multiple delimiters
+
+The format for enter multiple delimiter is: `//[{delimiter1}][{delimiter2}]...\n{numbers}`
+
+- example: `//[*][!!][r9r]\n11r9r22*hh*33!!44` will return `110`
+
+If one delimiter with multiple characters is desired the following format can be used: `//[{delimiter}]\n{numbers}`
+
+- example: `//[***]\n11***22***33` will return `66`
+
+** _NOTE:_ If you want to enter any of the special characters below, you must use the escape character to prevent ambiguity **
+
+- `\`
+- `[`
+- `]`
+
+** This does not apply to the single character delimiter. **
 
 ## Available Scripts
 
@@ -15,7 +56,6 @@ You will also see any lint errors in the console.
 ### `npm test`
 
 Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 ### `npm run build`
 
@@ -24,8 +64,6 @@ It correctly bundles React in production mode and optimizes the build for the be
 
 The build is minified and the filenames include the hashes.<br />
 Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
 ### `npm run eject`
 
@@ -36,33 +74,3 @@ If you aren’t satisfied with the build tool and configuration choices, you can
 Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify

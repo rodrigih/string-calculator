@@ -4,7 +4,9 @@ import {
   convertNums,
   getNegNums,
   getFormatData,
-  regExpEscape
+  regExpEscape,
+  regExpEscapeAll,
+  createDelimPattern
 } from "../../utils/utils";
 import "./Calculator.css";
 
@@ -13,7 +15,6 @@ class Calculator extends Component {
     super(props);
 
     this.state = {
-      delim: ",",
       altDelim: "\n",
       upperBound: 1000,
       upperBoundStr: "1000",
@@ -29,11 +30,14 @@ class Calculator extends Component {
   }
 
   calculateResult(obj) {
-    const { calcStr, delim: defaultDelim, altDelim, upperBound } = obj;
+    const { calcStr, altDelim, upperBound } = obj;
+    const defaultDelim = ",";
 
     const { delim: customDelim, numStr } = getFormatData(calcStr);
-    const delim = customDelim ? regExpEscape(customDelim) : defaultDelim;
-    const delimPattern = new RegExp(`${delim}|${altDelim}`);
+    const delim = customDelim ? customDelim : defaultDelim;
+    const delimPattern = Array.isArray(delim)
+      ? createDelimPattern([...delim, altDelim])
+      : new RegExp(`${regExpEscapeAll(delim)}|${altDelim}`);
 
     let numArr = numStr.trim().split(delimPattern);
     numArr = convertNums(numArr, upperBound);
