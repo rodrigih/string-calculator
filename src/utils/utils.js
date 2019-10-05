@@ -7,7 +7,7 @@ export const convertNums = (arr, upperBound) => {
     }
 
     let numVal = Number(curr);
-    let underLimit = upperBound ? numVal < upperBound : true;
+    let underLimit = upperBound ? numVal <= upperBound : true;
 
     return underLimit ? numVal : 0;
   });

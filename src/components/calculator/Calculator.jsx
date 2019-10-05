@@ -4,10 +4,10 @@ import {
   convertNums,
   getNegNums,
   getFormatData,
-  regExpEscape,
   regExpEscapeAll,
   createDelimPattern
 } from "../../utils/utils";
+import { OPERATIONS, JOIN_CHARS } from "./constants";
 import "./Calculator.css";
 
 class Calculator extends Component {
@@ -15,11 +15,12 @@ class Calculator extends Component {
     super(props);
 
     this.state = {
+      operation: "add",
       altDelim: "\n",
       upperBound: 1000,
       upperBoundStr: "1000",
       allowNegNums: false,
-      sum: 0,
+      calcResult: 0,
       numArr: [],
       calcStr: "",
       negNumArr: []
@@ -28,10 +29,11 @@ class Calculator extends Component {
     this.handleUpperBoundChange = this.handleUpperBoundChange.bind(this);
     this.handleCalcStrChange = this.handleCalcStrChange.bind(this);
     this.handleCheckBoxChange = this.handleCheckBoxChange.bind(this);
+    this.handleSelectChange = this.handleSelectChange.bind(this);
   }
 
   calculateResult(obj) {
-    const { calcStr, altDelim, upperBound } = obj;
+    const { calcStr, altDelim, upperBound, operation } = obj;
     const defaultDelim = ",";
 
     const { delim: customDelim, numStr } = getFormatData(calcStr);
@@ -42,9 +44,17 @@ class Calculator extends Component {
 
     let numArr = numStr.trim().split(delimPattern);
     numArr = convertNums(numArr, upperBound);
-    let sum = numArr.reduce((acc, curr) => acc + curr, 0);
 
-    return { ...obj, sum: sum, negNumArr: getNegNums(numArr), numArr: numArr };
+    const reducer = OPERATIONS[operation];
+
+    let calcResult = numArr.length === 1 ? numArr[0] : numArr.reduce(reducer);
+
+    return {
+      ...obj,
+      calcResult: calcResult,
+      negNumArr: getNegNums(numArr),
+      numArr: numArr
+    };
   }
 
   handleCheckBoxChange(event) {
@@ -55,12 +65,18 @@ class Calculator extends Component {
     );
   }
 
+  handleSelectChange(event) {
+    this.setState(
+      this.calculateResult({ ...this.state, operation: event.target.value })
+    );
+  }
+
   handleUpperBoundChange(event) {
     const newStr = event.target.value;
-    const newUpperBound = Number(newStr);
+    const newUpperBound = newStr === "" ? false : Number(newStr);
 
     /* Invalid upper bound makes no changes */
-    if (!newUpperBound) {
+    if (!newUpperBound && newStr != "") {
       this.setState({
         upperBound: newUpperBound,
         upperBoundStr: newStr
@@ -84,17 +100,17 @@ class Calculator extends Component {
   }
 
   createEqDisp() {
-    const { numArr, allowNegNums } = this.state;
+    const { numArr, allowNegNums, operation } = this.state;
     const dispNumArr = numArr.map(num =>
       allowNegNums && num < 0 ? `(${num})` : num
     );
-    return dispNumArr.join("+");
+    return dispNumArr.join(JOIN_CHARS[operation]);
   }
 
   render() {
     const {
       calcStr,
-      sum,
+      calcResult,
       numArr,
       negNumArr,
       upperBound,
@@ -109,10 +125,10 @@ class Calculator extends Component {
 
     let resultDiv = (
       <div className="result">
-        <p>Sum: {sum}</p>
+        <p>Result: {calcResult}</p>
         {numArr.length ? (
           <p>
-            {this.createEqDisp()} = {sum}
+            {this.createEqDisp()} = {calcResult}
           </p>
         ) : (
           ""
@@ -167,6 +183,23 @@ class Calculator extends Component {
                 checked={allowNegNums}
                 onChange={this.handleCheckBoxChange}
               />
+            </div>
+
+            <div>
+              <label>
+                Operation:{" "}
+                <select
+                  id="operation-selection"
+                  type="select"
+                  value={this.operation}
+                  onChange={this.handleSelectChange}
+                >
+                  <option value="add">addition</option>
+                  <option value="subtract">subtraction</option>
+                  <option value="multiply">multiplication</option>
+                  <option value="divide">division</option>
+                </select>
+              </label>
             </div>
 
             <textarea
