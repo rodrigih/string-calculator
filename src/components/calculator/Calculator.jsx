@@ -10,39 +10,86 @@ class Calculator extends Component {
     this.state = {
       delim: ",",
       altDelim: "\n",
+      upperBound: 1000,
+      upperBoundStr: "1000",
+      allowNegNums: false,
       sum: 0,
-      calcString: "",
-      hasError: false,
+      calcStr: "",
       negNumArr: []
     };
 
-    this.handleChange = this.handleChange.bind(this);
+    this.handleUpperBoundChange = this.handleUpperBoundChange.bind(this);
+    this.handleCalcStrChange = this.handleCalcStrChange.bind(this);
+    this.handleCheckBoxChange = this.handleCheckBoxChange.bind(this);
   }
 
-  handleChange(event) {
-    const { delim, altDelim } = this.state;
-
+  calculateResult(obj) {
+    const { calcStr, delim, altDelim, upperBound, allowNegNums } = obj;
     const delimPattern = new RegExp(`${delim}|${altDelim}`);
 
-    let newStr = event.target.value;
-    let numArr = newStr.trim().split(delimPattern);
-    numArr = convertNums(numArr);
-
+    let numArr = calcStr.trim().split(delimPattern);
+    numArr = convertNums(numArr, upperBound);
     let sum = numArr.reduce((acc, curr) => acc + curr, 0);
 
-    this.setState({
-      sum: sum,
-      calcString: newStr,
-      negNumArr: getNegNums(numArr)
-    });
+    return { ...obj, sum: sum, negNumArr: getNegNums(numArr) };
+  }
+
+  handleCheckBoxChange(event) {
+    const isChecked = event.target.checked;
+
+    this.setState(
+      this.calculateResult({ ...this.state, allowNegNums: isChecked })
+    );
+  }
+
+  handleUpperBoundChange(event) {
+    const { delim, altDelim, calcStr } = this.state;
+
+    const newStr = event.target.value;
+    const newUpperBound = Number(newStr);
+
+    /* Invalid upper bound makes no changes */
+    if (!newUpperBound) {
+      this.setState({
+        upperBound: newUpperBound,
+        upperBoundStr: newStr
+      });
+      return;
+    }
+
+    this.setState(
+      this.calculateResult({
+        ...this.state,
+        upperBound: newUpperBound,
+        upperBoundStr: newStr
+      })
+    );
+  }
+
+  handleCalcStrChange(event) {
+    const newStr = event.target.value;
+
+    this.setState(this.calculateResult({ ...this.state, calcStr: newStr }));
   }
 
   render() {
-    const { calcString, sum, negNumArr } = this.state;
+    const {
+      calcStr,
+      sum,
+      negNumArr,
+      upperBound,
+      upperBoundStr,
+      allowNegNums
+    } = this.state;
+
+    let upperBoundError = Number.isNaN(upperBound);
+    let hasNegNumError = !allowNegNums && negNumArr.length;
+
+    let hasError = upperBoundError || hasNegNumError;
 
     let resultDiv = <div className="result"> Sum: {sum} </div>;
 
-    let errorDiv = (
+    let negNumErrorDiv = (
       <div className="flex-column error">
         <b>Error:</b>
         Remove the following negative numbers:
@@ -50,26 +97,62 @@ class Calculator extends Component {
       </div>
     );
 
+    let upperBoundErrorDiv = (
+      <div className="flex-column error">
+        <b>Error:</b>
+        Enter a valid number for the upper bound.
+      </div>
+    );
+
+    let errorDiv = upperBoundError ? upperBoundErrorDiv : negNumErrorDiv;
+
     return (
       <div className="calculator flex">
         <div>
           <h2>Enter calculation string</h2>
-          <form>
+          <form onSubmit={e => e.preventDefault()}>
+            <div>
+              <label htmlFor="upperBound">Upper Bound: </label>
+              <input
+                type="text"
+                className={cx({
+                  "calculator-input": !upperBoundError,
+                  "calculator-input-error": upperBoundError
+                })}
+                id="upperBound"
+                name="upperBound"
+                value={upperBoundStr}
+                onChange={this.handleUpperBoundChange}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="allow-negatives">Allow negatives: </label>
+              <input
+                type="checkbox"
+                name="allow-negatives"
+                id="allow-negatives"
+                value="allow-negatives"
+                checked={allowNegNums}
+                onChange={this.handleCheckBoxChange}
+              />
+            </div>
+
             <textarea
               className={cx({
-                "calculator-textarea-error": negNumArr.length,
-                "calculator-textarea": !negNumArr.length
+                "calculator-textarea-error": hasNegNumError,
+                "calculator-textarea": !hasNegNumError
               })}
-              value={calcString}
+              value={calcStr}
               placeholder="Enter calculation"
-              onChange={this.handleChange}
+              onChange={this.handleCalcStrChange}
             />
           </form>
         </div>
+
         <div>
           <h2>Result</h2>
-          {negNumArr.length ? errorDiv : resultDiv}
-          resultDiv
+          {hasError ? errorDiv : resultDiv}
         </div>
       </div>
     );

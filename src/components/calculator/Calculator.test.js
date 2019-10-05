@@ -13,102 +13,148 @@ const enterStr = str => {
   });
 };
 
+const enterUpperBound = str => {
+  wrapper.find("input#upperBound").simulate("change", {
+    target: { value: str }
+  });
+};
+
+const markCheckBox = bool => {
+  wrapper.find("input#allow-negatives").simulate("change", {
+    target: { checked: bool }
+  });
+};
+
 describe("Calculator", () => {
-  describe("with valid numbers", () => {
-    test("renders result div", () => {
-      enterStr("1,2,3");
-      expect(
-        wrapper
-          .find("div.result")
-          .text()
-          .includes("Sum")
-      ).toBe(true);
+  describe("textarea input", () => {
+    describe("with valid numbers", () => {
+      test("renders result div", () => {
+        enterStr("1,2,3");
+        expect(
+          wrapper
+            .find("div.result")
+            .text()
+            .includes("Sum")
+        ).toBe(true);
+      });
+
+      test("does not render error div", () => {
+        enterStr("1,2,3");
+        expect(wrapper.find("div.error")).toHaveLength(0);
+      });
+
+      test("gives textarea class", () => {
+        enterStr("1,2,3");
+        expect(wrapper.find("textarea").hasClass("calculator-textarea")).toBe(
+          true
+        );
+      });
     });
 
-    test("does not render error div", () => {
-      enterStr("1,2,3");
-      expect(wrapper.find("div.error")).toHaveLength(0);
-    });
+    describe("with negative numbers", () => {
+      test("renders error div", () => {
+        markCheckBox(false);
+        enterStr("1,2,-3");
+        expect(wrapper.find("div.error")).toHaveLength(1);
+      });
 
-    test("gives textarea class", () => {
-      enterStr("1,2,3");
-      expect(wrapper.find("textarea").hasClass("calculator-textarea")).toBe(
-        true
-      );
+      test("does not render result div", () => {
+        enterStr("1,2,-3");
+        expect(wrapper.find("div.result")).toHaveLength(0);
+      });
+      test("gives textarea-error class", () => {
+        enterStr("-1,2,3");
+        expect(
+          wrapper.find("textarea").hasClass("calculator-textarea-error")
+        ).toBe(true);
+      });
     });
   });
 
-  describe("with negative numbers", () => {
-    test("renders error div", () => {
-      enterStr("1,2,-3");
-      expect(
-        wrapper
-          .find("div.error")
-          .text()
-          .includes("Error")
-      ).toBe(true);
+  describe("upperBound input", () => {
+    describe("with valid number", () => {
+      test("does not render error div", () => {
+        enterStr("");
+        enterUpperBound("10");
+        expect(wrapper.find("div.error")).toHaveLength(0);
+      });
+
+      test("correctly updates state ", () => {
+        enterUpperBound("10");
+        expect(wrapper.state("upperBound")).toBe(10);
+        expect(wrapper.state("upperBoundStr")).toEqual("10");
+      });
     });
 
-    test("does not render result div", () => {
-      enterStr("1,2,-3");
-      expect(wrapper.find("div.result")).toHaveLength(0);
+    describe("with invalid number", () => {
+      test("renders error div", () => {
+        enterUpperBound("10hello");
+        expect(wrapper.find("div.error")).toHaveLength(1);
+      });
     });
-  });
-
-  test("gives textarea-error class", () => {
-    enterStr("-1,2,3");
-    expect(wrapper.find("textarea").hasClass("calculator-textarea-error")).toBe(
-      true
-    );
   });
 });
 
-describe("onChange()", () => {
-  describe("with comma delimiter", () => {
-    describe("and valid numbers", () => {
-      test("adds one number", () => {
-        enterStr("20");
-        expect(wrapper.state("sum")).toBe(20);
+describe("handleCalcStrChange()", () => {
+  describe("with comma delimiter,", () => {
+    describe("with default options,", () => {
+      describe("and valid numbers", () => {
+        test("adds one number", () => {
+          enterStr("20");
+          expect(wrapper.state("sum")).toBe(20);
+        });
+
+        test("adds multiple numbers", () => {
+          enterStr("10,2,10,10,10");
+          expect(wrapper.state("sum")).toBe(42);
+
+          enterStr("1,2,3,4,5,6,7,8,9,10,11,12");
+          expect(wrapper.state("sum")).toBe(78);
+        });
+
+        test("adds positive numbers and negative numbers", () => {
+          enterStr("80,-20,-10,5");
+          expect(wrapper.state("sum")).toBe(55);
+        });
       });
+      describe("and valid and invalid numbers", () => {
+        test("adds empty string", () => {
+          enterStr("");
+          expect(wrapper.state("sum")).toBe(0);
+        });
 
-      test("adds two numbers", () => {
-        enterStr("1,5000");
-        expect(wrapper.state("sum")).toBe(5001);
+        test("ignores invalid numbers", () => {
+          enterStr("hello,world,foo,bar");
+          expect(wrapper.state("sum")).toBe(0);
+        });
+
+        test("adds valid numbers and ignores invalid numbers", () => {
+          enterStr("hello,5,world,a2,10");
+          expect(wrapper.state("sum")).toBe(15);
+        });
       });
+    });
 
-      test("adds multiple numbers", () => {
-        enterStr("10,2,10,10,10");
-        expect(wrapper.state("sum")).toBe(42);
-
-        enterStr("1,2,3,4,5,6,7,8,9,10,11,12");
-        expect(wrapper.state("sum")).toBe(78);
-      });
-
-      test("adds negative numbers", () => {
+    describe("and allows negative numbers", () => {
+      test("does not ignore negative numbers", () => {
+        markCheckBox(true);
         enterStr("-2,-2,-2");
         expect(wrapper.state("sum")).toBe(-6);
       });
 
-      test("adds positive and negative numbers", () => {
+      test("adds multiple positive and negative numbers", () => {
+        markCheckBox(true);
         enterStr("80,-20,-10,5");
         expect(wrapper.state("sum")).toBe(55);
       });
     });
 
-    describe("and valid and invalid numbers", () => {
-      test("adds empty string", () => {
-        enterStr("");
-        expect(wrapper.state("sum")).toBe(0);
-      });
-
-      test("ignores invalid numbers", () => {
-        enterStr("hello,world,foo,bar");
-        expect(wrapper.state("sum")).toBe(0);
-      });
-
-      test("adds valid numbers and ignores invalid numbers", () => {
-        enterStr("hello,5,world,a2,10");
-        expect(wrapper.state("sum")).toBe(15);
+    describe("and custom upperBound", () => {
+      test("ignores numbers greater than upperbound", () => {
+        markCheckBox(false);
+        enterUpperBound("100");
+        enterStr("10,20,30,200,400,500");
+        expect(wrapper.state("sum")).toBe(60);
       });
     });
   });
@@ -126,12 +172,14 @@ describe("onChange()", () => {
       });
 
       test("adds negative numbers", () => {
+        markCheckBox(true);
         let numArr = [-2, -2, -2];
         enterStr(numArr.join("\n"));
         expect(wrapper.state("sum")).toBe(-6);
       });
 
       test("adds positive and negative numbers", () => {
+        markCheckBox(true);
         let numArr = [80, -20, -10, 5];
         enterStr(numArr.join("\n"));
         expect(wrapper.state("sum")).toBe(55);
@@ -161,6 +209,7 @@ describe("onChange()", () => {
       });
 
       test("adds positive and negative numbers", () => {
+        markCheckBox(true);
         enterStr("-10,6\n-6,\n20");
         expect(wrapper.state("sum")).toBe(10);
       });
