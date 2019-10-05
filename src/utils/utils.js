@@ -18,12 +18,30 @@ export const getNegNums = arr => {
 };
 
 export const getFormatData = str => {
-  let pattern = /^\/\/(.)\n/;
-  let match = str.match(pattern);
+  let singleCharPattern = /^\/\/(.)\n/;
+  let multiCharPattern = /^\/\/\[(.+)\]\n/;
 
+  let singleMatch = str.match(singleCharPattern);
+  let multiMatch = str.match(multiCharPattern);
+
+  if (singleMatch) {
+    return {
+      delim: singleMatch[1],
+      numStr: str.replace(singleCharPattern, "")
+    };
+  }
+
+  if (multiMatch) {
+    return {
+      delim: multiMatch[1],
+      numStr: str.replace(multiCharPattern, "")
+    };
+  }
+
+  // No custom delimiters specified
   return {
-    delim: match ? match[1] : "",
-    numStr: str.replace(pattern, "")
+    delim: "",
+    numStr: str
   };
 };
 

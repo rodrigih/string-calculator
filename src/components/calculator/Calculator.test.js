@@ -224,12 +224,13 @@ describe("handleCalcStrChange()", () => {
   });
 
   describe("with custom single character delimiter", () => {
-    /* Allow Negative numbers for each test */
+    /* Allow Negative numbers for each test and reset UpperBound*/
     beforeAll(() => {
       markCheckBox(true);
+      enterUpperBound("1000");
     });
 
-    describe("with on special character", () => {
+    describe("with no special character", () => {
       test("adds valid numbers", () => {
         enterStr("//;\n1;2;3;4;5;-10");
         expect(wrapper.state("sum")).toBe(5);
@@ -250,6 +251,38 @@ describe("handleCalcStrChange()", () => {
       test("adds valid numbers and ignores invalid numbers", () => {
         enterStr("//[\n10[2,3[10\n5");
         expect(wrapper.state("sum")).toBe(25);
+      });
+    });
+  });
+
+  describe("with custom multi-character delimiter", () => {
+    /* Allow Negative numbers for each test and reset upperBound*/
+    beforeAll(() => {
+      markCheckBox(true);
+      enterUpperBound("1000");
+    });
+
+    describe("with no special characters", () => {
+      test("adds valid numbers", () => {
+        enterStr("//[***]\n11***22***33");
+        expect(wrapper.state("sum")).toBe(66);
+      });
+
+      test("adds valid numbers and ignores invalid numbers", () => {
+        enterStr("//[and]\n-37and100and4,000and19");
+        expect(wrapper.state("sum")).toBe(82);
+      });
+    });
+
+    describe("with special character(s)", () => {
+      test("adds valid numbers", () => {
+        enterStr("//[[]]\n1[]87[]66\n-34");
+        expect(wrapper.state("sum")).toBe(120);
+      });
+
+      test("adds valid numbers and ignores invalid numbers", () => {
+        enterStr("//[(|)]\n111\n222(|)ignore(|)LoremIpsumDimSum(|)333");
+        expect(wrapper.state("sum")).toBe(666);
       });
     });
   });

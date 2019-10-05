@@ -37,7 +37,7 @@ describe("convertNums()", () => {
 });
 
 describe("getFormatData()", () => {
-  test("parses string and delimiter", () => {
+  test("parses string and single-character delimiter", () => {
     const { delim, numStr } = getFormatData("//;\n1,2,3,4");
     expect(delim).toEqual(";");
     expect(numStr).toEqual("1,2,3,4");
@@ -46,6 +46,12 @@ describe("getFormatData()", () => {
   test("returns empty delimiter when no delimiter specified", () => {
     const { delim, numStr } = getFormatData("1,2,3,4");
     expect(delim).toEqual("");
+    expect(numStr).toEqual("1,2,3,4");
+  });
+
+  test("parses string and multi-character delimiter", () => {
+    const { delim, numStr } = getFormatData("//[***]\n1,2,3,4");
+    expect(delim).toEqual("***");
     expect(numStr).toEqual("1,2,3,4");
   });
 });
