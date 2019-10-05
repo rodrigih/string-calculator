@@ -93,6 +93,35 @@ describe("Calculator", () => {
       });
     });
   });
+
+  describe("result div", () => {
+    describe("shows equation", () => {
+      /* Allow Negative numbers for each test and reset upperBound*/
+      beforeAll(() => {
+        markCheckBox(true);
+        enterUpperBound("1000");
+      });
+      test("with positive numbers", () => {
+        enterStr("1,2,3,4");
+        expect(
+          wrapper
+            .find("div.result")
+            .text()
+            .includes("1+2+3+4 = 10")
+        );
+      });
+
+      test("with negative numbers including parenthesis", () => {
+        enterStr("1,-2,3,4");
+        expect(
+          wrapper
+            .find("div.result")
+            .text()
+            .includes("1+(-2)+3+4 = 10")
+        );
+      });
+    });
+  });
 });
 
 describe("handleCalcStrChange()", () => {

@@ -20,6 +20,7 @@ class Calculator extends Component {
       upperBoundStr: "1000",
       allowNegNums: false,
       sum: 0,
+      numArr: [],
       calcStr: "",
       negNumArr: []
     };
@@ -43,7 +44,7 @@ class Calculator extends Component {
     numArr = convertNums(numArr, upperBound);
     let sum = numArr.reduce((acc, curr) => acc + curr, 0);
 
-    return { ...obj, sum: sum, negNumArr: getNegNums(numArr) };
+    return { ...obj, sum: sum, negNumArr: getNegNums(numArr), numArr: numArr };
   }
 
   handleCheckBoxChange(event) {
@@ -82,10 +83,19 @@ class Calculator extends Component {
     this.setState(this.calculateResult({ ...this.state, calcStr: newStr }));
   }
 
+  createEqDisp() {
+    const { numArr, allowNegNums } = this.state;
+    const dispNumArr = numArr.map(num =>
+      allowNegNums && num < 0 ? `(${num})` : num
+    );
+    return dispNumArr.join("+");
+  }
+
   render() {
     const {
       calcStr,
       sum,
+      numArr,
       negNumArr,
       upperBound,
       upperBoundStr,
@@ -97,7 +107,18 @@ class Calculator extends Component {
 
     let hasError = upperBoundError || hasNegNumError;
 
-    let resultDiv = <div className="result"> Sum: {sum} </div>;
+    let resultDiv = (
+      <div className="result">
+        <p>Sum: {sum}</p>
+        {numArr.length ? (
+          <p>
+            {this.createEqDisp()} = {sum}
+          </p>
+        ) : (
+          ""
+        )}
+      </div>
+    );
 
     let negNumErrorDiv = (
       <div className="flex-column error">
