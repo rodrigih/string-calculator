@@ -16,3 +16,17 @@ export const convertNums = (arr, upperBound) => {
 export const getNegNums = arr => {
   return arr.filter(curr => curr < 0);
 };
+
+export const getFormatData = str => {
+  let pattern = /^\/\/(.)\n/;
+  let match = str.match(pattern);
+
+  return {
+    delim: match ? match[1] : "",
+    numStr: str.replace(pattern, "")
+  };
+};
+
+export const regExpEscape = str => {
+  return str.replace(/[-[\]{}()*+!<=:?.\/\\^$|#\s,]/g, "\\$&");
+};

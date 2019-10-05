@@ -1,6 +1,11 @@
 import React, { Component } from "react";
 import cx from "classnames";
-import { convertNums, getNegNums } from "../../utils/utils";
+import {
+  convertNums,
+  getNegNums,
+  getFormatData,
+  regExpEscape
+} from "../../utils/utils";
 import "./Calculator.css";
 
 class Calculator extends Component {
@@ -24,10 +29,13 @@ class Calculator extends Component {
   }
 
   calculateResult(obj) {
-    const { calcStr, delim, altDelim, upperBound, allowNegNums } = obj;
+    const { calcStr, delim: defaultDelim, altDelim, upperBound } = obj;
+
+    const { delim: customDelim, numStr } = getFormatData(calcStr);
+    const delim = customDelim ? regExpEscape(customDelim) : defaultDelim;
     const delimPattern = new RegExp(`${delim}|${altDelim}`);
 
-    let numArr = calcStr.trim().split(delimPattern);
+    let numArr = numStr.trim().split(delimPattern);
     numArr = convertNums(numArr, upperBound);
     let sum = numArr.reduce((acc, curr) => acc + curr, 0);
 
@@ -43,8 +51,6 @@ class Calculator extends Component {
   }
 
   handleUpperBoundChange(event) {
-    const { delim, altDelim, calcStr } = this.state;
-
     const newStr = event.target.value;
     const newUpperBound = Number(newStr);
 

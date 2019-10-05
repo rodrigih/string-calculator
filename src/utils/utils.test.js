@@ -1,4 +1,4 @@
-import { convertNums } from "./utils";
+import { convertNums, getFormatData } from "./utils";
 
 describe("convertNums()", () => {
   describe("that has no extra parameters", () => {
@@ -33,5 +33,19 @@ describe("convertNums()", () => {
       const arr = convertNums(["1", "5000", "1", "40"], 100);
       expect(arr).toEqual([1, 0, 1, 40]);
     });
+  });
+});
+
+describe("getFormatData()", () => {
+  test("parses string and delimiter", () => {
+    const { delim, numStr } = getFormatData("//;\n1,2,3,4");
+    expect(delim).toEqual(";");
+    expect(numStr).toEqual("1,2,3,4");
+  });
+
+  test("returns empty delimiter when no delimiter specified", () => {
+    const { delim, numStr } = getFormatData("1,2,3,4");
+    expect(delim).toEqual("");
+    expect(numStr).toEqual("1,2,3,4");
   });
 });

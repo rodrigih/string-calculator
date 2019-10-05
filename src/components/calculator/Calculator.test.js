@@ -222,4 +222,35 @@ describe("handleCalcStrChange()", () => {
       });
     });
   });
+
+  describe("with custom single character delimiter", () => {
+    /* Allow Negative numbers for each test */
+    beforeAll(() => {
+      markCheckBox(true);
+    });
+
+    describe("with on special character", () => {
+      test("adds valid numbers", () => {
+        enterStr("//;\n1;2;3;4;5;-10");
+        expect(wrapper.state("sum")).toBe(5);
+      });
+
+      test("adds valid numbers and ignores invalid numbers", () => {
+        enterStr("//;\n7;9;hello;4;,5,world;-1");
+        expect(wrapper.state("sum")).toBe(19);
+      });
+    });
+
+    describe("with special character", () => {
+      test("adds valid numbers", () => {
+        enterStr("//.\n1.2.3.4.5.-10.,100,100");
+        expect(wrapper.state("sum")).toBe(5);
+      });
+
+      test("adds valid numbers and ignores invalid numbers", () => {
+        enterStr("//[\n10[2,3[10\n5");
+        expect(wrapper.state("sum")).toBe(25);
+      });
+    });
+  });
 });
